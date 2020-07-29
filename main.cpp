@@ -209,10 +209,11 @@ void battle(int option, int level[], double attack[], double defend[], int life,
 void check_status(int level[], double attack[], double defend[], int life, int point, int index){
     cout << "*******************************************" << endl;
     cout << "Checking status..." << endl;
-    
     // delay to simulate loading
     sleep(2000);
-     
+    cout << "Level : " << level[index] << endl;
+    cout << "Attack: " << attack[index] << endl;
+    cout << "Defend: " << defend[index] << endl;
     cout << "*******************************************" << endl;
     cout << endl << endl;
     menu(level, attack, defend, life, point, index);
