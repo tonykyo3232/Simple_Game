@@ -2,10 +2,11 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 
 void fileOpen(int level[], double attack[], double defend[], int &count);
-void menu(char choice, int level[], double attack[], double defend[], int life, int point, int index);
-void battle(int choose, char choice, int level[], double attack[], double defend[], int life, int point, int index);
+void menu(int level[], double attack[], double defend[], int life, int point, int index);
+void battle(int option, int level[], double attack[], double defend[], int life, int point, int index);
 
 using namespace std;
 
@@ -14,7 +15,7 @@ int main()
     const int SIZE = 100;
     int count = 0;
     string name;
-    char choice;
+    // char choice;
     int life = 100,
         level[SIZE],
         point = 0,
@@ -32,7 +33,7 @@ int main()
     cout << "\n------------------------------------------" << endl;
     cout << "Hello "<< name << ", now you are in " << level[0] << " level, you are ready to have an adventure!" << endl;
     cout << "This game has 5 level. if you accomplish all of them. You are the winner!" << endl;
-    menu(choice, level, attack, defend, life, point, index);
+    menu(level, attack, defend, life, point, index);
 
     return 0;
 }
@@ -42,7 +43,7 @@ void fileOpen(int level[], double attack[], double defend[], int &count)
     fstream inputFile;
 
     // open the file
-    inputFile.open("Level List.txt");
+    inputFile.open("Level_List.txt");
 
     // read the file
     while (inputFile >> level[count] >> attack[count] >> defend[count])
@@ -54,9 +55,11 @@ void fileOpen(int level[], double attack[], double defend[], int &count)
     inputFile.close();
 }
 
-void menu(char choice, int level[], double attack[], double defend[], int life, int point, int index)
+void menu(int level[], double attack[], double defend[], int life, int point, int index)
 {
-        int choose = 0;
+        string user_input = "";
+        // int choose = 0;
+
         cout << "------------------------------------------" << endl;
         cout << "There are numbers of level you can choose." << endl;
         cout << "1: Story 1(Beginner)" << endl;
@@ -67,47 +70,67 @@ void menu(char choice, int level[], double attack[], double defend[], int life, 
         cout << "6: close the game." << endl;
         cout << "------------------------------------------" << endl;
         cout << "Please select the level: ";
-        cin >> choose;
+        // cin >> choose;
+        cin >> user_input;
 
-        switch(choose)
-        {
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                battle(choose, choice, level, attack, defend, life, point, index);
-                break;
-            case 6:
-                cout << "Game is over." << endl;
-                break;
-            default:
-                {
-                    cout << "Please enter the valid number: ";
-                }
-        }
+        // convert user input to integer
+        // if user enter "1", it will be converted to 1
+        // if user enter "abc", it will be converted to 0
+        stringstream toInt(user_input);
+
+        // store the user input into option as an integer
+        int option = 0;
+        toInt >> option;
+
+        //debug
+        // cout << "you enter: [" << option << "]"<< endl;
+
+        do {
+            switch(option) {
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                    battle(option, level, attack, defend, life, point, index);
+                    break;
+                case 6:
+                    cout << "Game is over." << endl;
+                    break;
+                default:
+                    {
+                        cout << "Please enter the valid number!" << endl;
+                        cout << "Please select the level: ";
+                        cin >> user_input;
+                        stringstream toInt(user_input);
+                        int option = 0;
+                        toInt >> option;
+                    }
+            }
+        } while(option < 1 || option > 7);
 }
 
-void battle(int choose, char choice, int level[], double attack[], double defend[], int life, int point, int index)
+void battle(int option, int level[], double attack[], double defend[], int life, int point, int index)
 {
     //default value (level 1)
+    char choice;
     double damage = 2;
     double monsterLife = 5;
 
     // adjust the level based on user's input
-    if (choose == 2){
+    if (option == 2){
         damage = 5;
         monsterLife = 10;
     }
-    else if(choose == 3){
+    else if(option == 3){
         damage = 15;
         monsterLife = 20;
     }
-    else if(choose == 4){
+    else if(option == 4){
         damage = 40;
         monsterLife = 50;
     }
-    else if(choose == 5){
+    else if(option == 5){
         damage = 150;
         monsterLife = 500;
     }
@@ -115,7 +138,7 @@ void battle(int choose, char choice, int level[], double attack[], double defend
     }
 
     cout << "------------------------------------------------" << endl;
-    cout << "=  You are in story " << choose << "." << endl;
+    cout << "=  You are in story " << option << "." << endl;
     cout << "=  Your current Level is: " << level[index] << endl;
     cout << "=  Your life now is: " << life << endl;
     cout << "=  Now my attack point is: " << attack[index] << endl;
@@ -170,5 +193,5 @@ void battle(int choose, char choice, int level[], double attack[], double defend
     cout << "Do you want to back to the menu?(Y/N)";
     cin >> choice;
     if(choice == 'Y' || choice == 'y')
-        menu(choice, level, attack, defend, life, point, index);
+        menu(level, attack, defend, life, point, index);
 }
