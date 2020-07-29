@@ -3,10 +3,16 @@
 #include <iomanip>
 #include <fstream>
 #include <sstream>
+#include <time.h>
 
 void fileOpen(int level[], double attack[], double defend[], int &count);
+
 void menu(int level[], double attack[], double defend[], int life, int point, int index);
 void battle(int option, int level[], double attack[], double defend[], int life, int point, int index);
+void check_status(int level[], double attack[], double defend[], int life, int point, int index);
+bool save_Player();
+bool load_Player();
+void sleep(unsigned int mseconds);
 
 using namespace std;
 
@@ -58,7 +64,6 @@ void fileOpen(int level[], double attack[], double defend[], int &count)
 void menu(int level[], double attack[], double defend[], int life, int point, int index)
 {
         string user_input = "";
-        // int choose = 0;
 
         cout << "------------------------------------------" << endl;
         cout << "There are numbers of level you can choose." << endl;
@@ -68,6 +73,7 @@ void menu(int level[], double attack[], double defend[], int life, int point, in
         cout << "4: Story 4(Hard)" << endl;
         cout << "5: Story 5(Hell)" << endl;
         cout << "6: close the game." << endl;
+        cout << "7: check your condition" << endl;
         cout << "------------------------------------------" << endl;
         cout << "Please select the level: ";
         // cin >> choose;
@@ -97,6 +103,9 @@ void menu(int level[], double attack[], double defend[], int life, int point, in
                 case 6:
                     cout << "Game is over." << endl;
                     break;
+                case 7:
+                    check_status(level, attack, defend, life, point, index);
+                    break;
                 default:
                     {
                         cout << "Please enter the valid number!" << endl;
@@ -107,7 +116,7 @@ void menu(int level[], double attack[], double defend[], int life, int point, in
                         toInt >> option;
                     }
             }
-        } while(option < 1 || option > 7);
+        } while(option < 1 || option > 8);
 }
 
 void battle(int option, int level[], double attack[], double defend[], int life, int point, int index)
@@ -194,4 +203,33 @@ void battle(int option, int level[], double attack[], double defend[], int life,
     cin >> choice;
     if(choice == 'Y' || choice == 'y')
         menu(level, attack, defend, life, point, index);
+}
+
+
+void check_status(int level[], double attack[], double defend[], int life, int point, int index){
+    cout << "*******************************************" << endl;
+    cout << "Checking status..." << endl;
+    
+    // delay to simulate loading
+    sleep(2000);
+     
+    cout << "*******************************************" << endl;
+    cout << endl << endl;
+    menu(level, attack, defend, life, point, index);
+}
+
+bool save_Player(){
+    return true;
+}
+
+bool load_Player(){
+    return true;
+}
+
+
+// reference: https://ubuntuforums.org/showthread.php?t=296142
+void sleep(unsigned int mseconds)
+{
+    clock_t goal = mseconds + clock();
+    while (goal > clock());
 }
