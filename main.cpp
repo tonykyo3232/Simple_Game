@@ -3,8 +3,8 @@
 #include <iomanip>
 #include <fstream> // file IO
 #include <sstream>
-
 #include <time.h>
+
 #include "player.h"
 
 void fileOpen(int level[], double attack[], double defend[], int &count);
@@ -21,19 +21,20 @@ using namespace std;
 int main()
 {
     const int SIZE = 100;
-    int count = 0;
-    string name;
-    int life = 100,
+    int count = 0,
+        life = 100,
         level[SIZE],
         point = 0,
         index = 0;
     double attack[SIZE],
            defend[SIZE];
 
-    Player P("",0,0,0,0);
-
     // read the context of the game
     fileOpen(level, attack, defend, count);
+
+    // variable for player
+    Player P;
+    string name;
 
     // welcome message
     cout << "------------------------------------------" << endl;
@@ -50,8 +51,12 @@ int main()
     // enter menu to start the selection
     menu(level, attack, defend, life, point, index, P);
 
-    // save player's information
-    save_player(level, attack, defend, life, point, index, P);
+    char choice;
+    cout << "Would you like to save your progress? (Y/N)";
+    cin >> choice;
+    if (choice == 'y' || choice == 'Y'){
+        save_player(level, attack, defend, life, point, index, P); // save player's information
+    }
 
     return 0;
 }
@@ -186,7 +191,7 @@ void battle(int option, int level[], double attack[], double defend[], int life,
         if (choice == 'n' || choice == 'N'){
             life = life - (damage + 2) + defend[index];
             cout << "The monster attacks you directly!!! Now your life is remaining " << life << " points. Please ATTACK back!!!" << endl;
-            break;
+            //break;
         }
     } while(monsterLife > 0);
 
