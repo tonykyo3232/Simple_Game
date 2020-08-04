@@ -15,6 +15,10 @@ private:
     int defend;
     double avoidRate;
 
+    // user account info
+    string user_name;
+    string passward;
+
     // player's accessories
     int money;
     int diamond;
@@ -29,6 +33,10 @@ public:
     int getLife() {return life;} const
     int getAtkPt(){return attack;} const
     int getDefPt(){return defend;} const
+    string getUser() {return user_name;} const
+    string getPwd() {return passward;} const
+    bool setUser(string entry_user) {this->user_name = entry_user; return true;}
+    bool setPwd(string entry_pwd) {this->passward = entry_pwd; return true;}
     bool setName(string entry_name) {this->name = entry_name; return true;}
     bool setLevel(int entry_level) { this->level = entry_level; return true;}
     bool setLife(int entry_life) {this->life = entry_life ; return true;}
