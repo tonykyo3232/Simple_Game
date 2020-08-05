@@ -9,9 +9,9 @@ using namespace std;
 Player::Player(){
 	name = "";
     level = 0;
-    life = 0;
-    attack = 0;
-    defend = 0;
+    life = 100;
+    attack = 1;
+    defend = 1;
     avoidRate = 0;
 
     // player's accessories
