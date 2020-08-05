@@ -345,9 +345,9 @@ bool login(string &username, string &passward, Player &P){
             readPwd = "",
                name = "";
     int level = 0,
-        life = 0,
-        attack = 0,
-        defend = 0;
+        life = 100,
+        attack = 1,
+        defend = 1;
 
     do{
         cout << "Please enter your username (type NA to quit login):";
@@ -386,14 +386,14 @@ bool login(string &username, string &passward, Player &P){
             // once the user account is found, check the passward next
             fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life;
 
-            // debug
-            cout << "readUser: [" << readUser << "]" << endl;
-            cout << "readPwd: [" << readPwd << "]" << endl;
-            cout << "name: [" << name << "]" << endl;
-            cout << "level: [" << level << "]" << endl;
-            cout << "attack: [" << attack << "]" << endl;
-            cout << "defend: ["<< defend << "]" << endl;
-            cout << "life: [" << life << "]" << endl;
+            // // debug
+            // cout << "readUser: [" << readUser << "]" << endl;
+            // cout << "readPwd: [" << readPwd << "]" << endl;
+            // cout << "name: [" << name << "]" << endl;
+            // cout << "level: [" << level << "]" << endl;
+            // cout << "attack: [" << attack << "]" << endl;
+            // cout << "defend: ["<< defend << "]" << endl;
+            // cout << "life: [" << life << "]" << endl;
 
             // if the username and passward match, it log in sucessfully
             if(readUser == username && readPwd == passward){
