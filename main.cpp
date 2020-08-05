@@ -4,6 +4,7 @@
 #include <fstream> // file IO
 #include <sstream>
 #include <time.h>
+#include <algorithm>
 
 #include "player.h"
 
@@ -48,14 +49,12 @@ int main()
     bool hasAccount = login(username, passward, P);
 
     if(hasAccount){
-        // do sth
         cout << "------------------------------------------" << endl;
         // cout << "Welcome to Tony's game!" << endl;
         cout << "Welcome back " << username << "!" << endl;
         cout << "------------------------------------------" << endl;
     }
     else{
-        // do sth
         // welcome message
         cout << "------------------------------------------" << endl;
         // cout << "Welcome to Tony's game!" << endl;
@@ -70,21 +69,8 @@ int main()
         cout << "This game has 5 level. if you accomplish all of them. You are the winner!" << endl;
     }
 
-    // // welcome message
-    // cout << "------------------------------------------" << endl;
-    // cout << "Welcome to Tony's game!" << endl;
-    // cout << "Please enter your name: " << endl;
-    // cout << "------------------------------------------" << endl;
-    // cout << "Enter name: ";
-    // cin >> name;
-    // P.setName(name);
-    // cout << "\n------------------------------------------" << endl;
-    // cout << "Hello "<< name << ", now you are in level "<< level[0] << " , you are ready to have an adventure!" << endl;
-    // cout << "This game has 5 level. if you accomplish all of them. You are the winner!" << endl;
-
-
     // enter menu to start the selection
-    //menu(level, attack, defend, life, point, index, P);
+    menu(level, attack, defend, life, point, index, P);
 
     char choice;
     cout << "Would you like to save your progress? (Y/N)";
@@ -265,10 +251,10 @@ void check_status(int level[], double attack[], double defend[], int life, int p
     cout << "Checking status..." << endl;
     // delay to simulate loading
     sleep(1900);
-    cout << "=  Your current Level is: " << level[index] << endl;
-    cout << "=  Your life now is: " << life << endl;
-    cout << "=  Now your attack point is: " << attack[index] << endl;
-    cout << "=  and defend point: " << defend[index] << endl;
+    cout << "=  Your current Level is: " << P.getLevel() << endl;
+    cout << "=  Your life now is: " << P.getLife() << endl;
+    cout << "=  Now your attack point is: " << P.getAtkPt() << endl;
+    cout << "=  and defend point: " << P.getDefPt() << endl;
     cout << "*******************************************" << endl;
     cout << endl << endl;
     menu(level, attack, defend, life, point, index, P);
@@ -279,24 +265,31 @@ void check_status(int level[], double attack[], double defend[], int life, int p
 bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int point, int index, Player P){
     string account_name;
     string pwd;
-    cout << "Please enter your account name (no spaces in between): ";
-    cin >> account_name;
-    cout << "Please enter your passward (no spaces in between): ";
-    cin >> pwd;
+
+    // first time user
+    if(username.empty() == true || passward.empty() == true){
+        cout << "Please enter your account name (no spaces in between): ";
+        cin >> account_name;
+        cout << "Please enter your passward (no spaces in between): ";
+        cin >> pwd;
+        username = account_name;
+        passward = pwd;
+    }
 
     cout << "Saving the player's data..." << endl;
     ofstream fout;
 
     // overwrite the user's data
+    // saving order: account name, password, name, level, attack point, defend point, life point
     fout.open("player_" + account_name + "_data" + ".txt");
-    // fout << P.getName() << " " << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << endl;
-    fout << P.getUser() << " " << P.getPwd() << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << endl;
+    fout << username << " " << passward << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << endl;
     fout.close();
 
+    // disable for now
     // create an account for user if they doesn't have one
-    fout.open("player_" + account_name + "_info" + ".txt");
-    fout << account_name << " " << passward;
-    fout.close();
+    // fout.open("player_" + account_name + "_info" + ".txt");
+    // fout << account_name << " " << passward;
+    // fout.close();
 
     sleep(1600); // delay to simulate loading
     cout << "Data is saved..." << endl;
@@ -320,31 +313,38 @@ void updateInfo(int level, double attack, double defend, int life, Player &P){
     P.setLife(life);
     P.setAtkpt(attack);
     P.setDefpt(defend);
-
     sleep(1000); // delay to simulate loading
-
-    // // debug
-    // cout << "################" << endl;
-    // cout << P.getName() << endl;
-    // cout << P.getLevel() << endl;
-    // cout << P.getLife() << endl;
-    // cout << P.getAtkPt() << endl;
-    // cout << P.getDefPt() << endl;
-    // cout << "################" << endl;
 }
 
 // login in user's account
 bool login(string &username, string &passward, Player &P){
-
     fstream fin;
     bool status = false;
+
     string readUser = "",
-           readPwd = "";
-    char option;
+            readPwd = "",
+               name = "";
+    int level = 0,
+        life = 0,
+        attack = 0,
+        defend = 0;
 
     do{
-        cout << "Please enter your username:";
+        cout << "Please enter your username (type NA to quit login):";
         cin >> username;
+
+        // convert string to back to lower case
+        // reference: https://thispointer.com/converting-a-string-to-upper-lower-case-in-c-using-stl-boost-library/#:~:text=Convert%20a%20String%20to%20Lower%20Case%20using%20STL&text=int%20tolower%20(%20int%20c%20)%3B,function%20each%20of%20them%20i.e.
+        for_each(username.begin(), username.end(), [](char & c) {
+            c = ::tolower(c);
+        });
+
+        // quit login and begin as a new user
+        if(username == "na"){
+            status = false;
+            break;
+        }
+
         sleep(1000); // delay to simulate loading
         cout << "Please enter your passward:";
         cin >> passward;
@@ -358,17 +358,22 @@ bool login(string &username, string &passward, Player &P){
 
         // check if the file is found or not
         if(fin.is_open() == false){
-            cout << "Cannot file user data.." << endl;
+            cout << "Cannot find user data.." << endl;
             cout << "Please enter the username again..." << endl;
             sleep(1000); // delay to simulate loading
         }
         else{
             // once the user account is found, check the passward next
-            fin >> readUser >> readPwd;
+            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life;
 
             // debug
             cout << "readUser: [" << readUser << "]" << endl;
             cout << "readPwd: [" << readPwd << "]" << endl;
+            cout << "name: [" << name << "]" << endl;
+            cout << "level: [" << level << "]" << endl;
+            cout << "attack: [" << attack << "]" << endl;
+            cout << "defend: ["<< defend << "]" << endl;
+            cout << "life: [" << life << "]" << endl;
 
             // if the username and passward match, it log in sucessfully
             if(readUser == username && readPwd == passward){
@@ -387,6 +392,11 @@ bool login(string &username, string &passward, Player &P){
     // save account info
     P.setUser(username);
     P.setPwd(passward);
+    P.setName(name);
+    P.setLevel(level);
+    P.setAtkpt(attack);
+    P.setDefpt(defend);
+    P.setLife(life);
 
     return status;
 }
