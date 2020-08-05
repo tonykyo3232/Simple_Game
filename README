@@ -1,10 +1,10 @@
-Simple Game
+Sample Game
 This is the game that is written in C++. In this project, I am writting a program that similate a game. User will be able to
 - Level Up via battle (in progress)
-- Save your information (in progress)
-- Load your infornation (in progress)
+- Save your information (completed)
+- Load your infornation (completed)
 
 Future design:
 - able to purchase items
-- allow to login with specific account
-- cheating code 
+- adding a new feature: avoid rate
+- cheating code such as increaase attack point, decrease monster's attack...etc 
