@@ -1,10 +1,10 @@
 Sample Game
 This is the game that is written in C++. In this project, I am writting a program that similate a game. User will be able to
 
-- Level Up via battle (in progress)
-* Currently develop a new level system: setting up that the level system will not depend on .txt file but will be handle by if-else statement
-* Adding one more feature in player class: exp to keep track of levels
-* Obtaining money from battle. User will be able to use the money to buy equipments
+- Level Up via battle
+* Currently develop a new level system: setting up that the level will be increase when it reaches the required exp (completed)
+* Adding one more feature in player class: exp to keep track of levels (completed)
+* Obtaining money from battle. User will be able to use the money to buy equipments (in progress)
 
 - Save your information (completed)
 - Load your infornation (completed)

@@ -13,6 +13,7 @@ private:
     int life;
     int attack;
     int defend;
+    int exp;
     double avoidRate;
 
     // user account info
@@ -33,6 +34,7 @@ public:
     int getLife() {return life;} const
     int getAtkPt(){return attack;} const
     int getDefPt(){return defend;} const
+    int getExp(){return exp;} const
     string getUser() {return user_name;} const
     string getPwd() {return passward;} const
     bool setUser(string entry_user) {this->user_name = entry_user; return true;}
@@ -42,6 +44,7 @@ public:
     bool setLife(int entry_life) {this->life = entry_life ; return true;}
     bool setAtkpt(int entry_attack) {this->attack = entry_attack; return true;}
     bool setDefpt(int entry_defend) {this->defend = entry_defend; return true;}
+    bool setExp(int entry_exp) {this->exp = entry_exp; return true;}
 
     // future design parts
     double getAvoidRate();

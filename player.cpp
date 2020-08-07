@@ -8,12 +8,13 @@ using namespace std;
 // Default Constructor implementation
 Player::Player(){
 	name = "";
-    level = 0;
+    level = 1;
     life = 100;
     attack = 1;
     defend = 1;
     avoidRate = 0;
-
+    exp = 0;
+    
     // player's accessories
     money = 0;
     diamond = 0;

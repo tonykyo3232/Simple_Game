@@ -9,14 +9,14 @@
 
 #include "player.h"
 
-void fileOpen(int level[], double attack[], double defend[], int &count);
+// void fileOpen(int level[], double attack[], double defend[], int &count);
+void fileOpen(int level[], double attack[], double defend[], int exp[], int &count);
 bool login(string &userName, string &passward, Player&);
-void menu(int level[], double attack[], double defend[], int life, int point, int index, Player&);
-void battle(int option, int level[], double attack[], double defend[], int life, int point, int index, Player&);
-void check_status(int level[], double attack[], double defend[], int life, int point, int index, Player);
-void updateInfo(int level, double attack, double defend, int life, Player&);
-bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int point, int index, Player);
-bool load_player();
+void menu(int level[], double attack[], double defend[], int life, int exp[], int index, Player&);
+void battle(int option, int level[], double attack[], double defend[], int life, int exp[], int index, Player&);
+void check_status(int level[], double attack[], double defend[], int life, int exp[], int index, Player);
+void updateInfo(int level, double attack, double defend, int life, int curr_exp, Player&);
+bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int exp[], int index, Player);
 void sleep(unsigned int mseconds);
 
 using namespace std;
@@ -27,13 +27,14 @@ int main()
     int count = 0,
         life = 100,
         level[SIZE],
-        point = 0,
-        index = 0;
+        index = 0,
+        exp[SIZE];
     double attack[SIZE],
            defend[SIZE];
 
     // read the context of the game
-    fileOpen(level, attack, defend, count);
+    // fileOpen(level, attack, defend, count);
+    fileOpen(level, attack, defend, exp, count);
 
     // variables for player
     Player P;
@@ -54,6 +55,7 @@ int main()
         cout << "------------------------------------------" << endl;
         cout << "Welcome back " << username << "!" << endl;
         cout << "------------------------------------------" << endl;
+        system ("PAUSE");
     }
     else{
         // welcome message
@@ -71,19 +73,20 @@ int main()
     }
 
     // enter menu to start the selection
-    menu(level, attack, defend, life, point, index, P);
+    menu(level, attack, defend, life, exp, index, P);
 
     char choice;
     cout << "Would you like to save your progress? (Y/N)";
     cin >> choice;
     if (choice == 'y' || choice == 'Y'){
-        save_player(username, passward, level, attack, defend, life, point, index, P); // save player's information
+        save_player(username, passward, level, attack, defend, life, exp, index, P); // save player's information
     }
 
     return 0;
 }
 
-void fileOpen(int level[], double attack[], double defend[], int &count)
+// void fileOpen(int level[], double attack[], double defend[], int &count)
+void fileOpen(int level[], double attack[], double defend[], int exp[], int &count)
 {
     fstream inputFile;
 
@@ -91,7 +94,7 @@ void fileOpen(int level[], double attack[], double defend[], int &count)
     inputFile.open("Level_List.txt");
 
     // read the file
-    while (inputFile >> level[count] >> attack[count] >> defend[count])
+    while (inputFile >> level[count] >> attack[count] >> defend[count] >> exp[count])
     {
         count++;
     }
@@ -100,7 +103,7 @@ void fileOpen(int level[], double attack[], double defend[], int &count)
     inputFile.close();
 }
 
-void menu(int level[], double attack[], double defend[], int life, int point, int index, Player &P)
+void menu(int level[], double attack[], double defend[], int life, int exp[], int index, Player &P)
 {
         string user_input = "";
         system ("CLS");
@@ -136,13 +139,13 @@ void menu(int level[], double attack[], double defend[], int life, int point, in
                 case 3:
                 case 4:
                 case 5:
-                    battle(option, level, attack, defend, life, point, index, P);
+                    battle(option, level, attack, defend, life, exp, index, P);
                     break;
                 case 6:
                     cout << "Game is over." << endl;
                     break;
                 case 7:
-                    check_status(level, attack, defend, life, point, index, P);
+                    check_status(level, attack, defend, life, exp, index, P);
                     break;
                 default:
                     {
@@ -157,29 +160,34 @@ void menu(int level[], double attack[], double defend[], int life, int point, in
         } while(option < 1 || option > 8);
 }
 
-void battle(int option, int level[], double attack[], double defend[], int life, int point, int index, Player &P)
+void battle(int option, int level[], double attack[], double defend[], int life, int exp[], int index, Player &P)
 {
     // default value (level 1)
     char choice;
     double damage = 2;
     double monsterLife = 5;
+    int exp_gain = 25;
 
     // adjust the level based on user's input
     if (option == 2){
         damage = 5;
         monsterLife = 10;
+        exp_gain = 50;
     }
     else if(option == 3){
         damage = 15;
         monsterLife = 20;
+        exp_gain = 75;
     }
     else if(option == 4){
         damage = 40;
         monsterLife = 50;
+        exp_gain = 150;
     }
     else if(option == 5){
         damage = 150;
         monsterLife = 500;
+        exp_gain = 300;
     }
     else{
     }
@@ -196,7 +204,8 @@ void battle(int option, int level[], double attack[], double defend[], int life,
     int game_level = P.getLevel(),
         game_life = P.getLife(),
         game_attack = P.getAtkPt(),
-        game_defend = P.getDefPt();
+        game_defend = P.getDefPt(),
+        curr_exp = P.getExp();
 
     do{
         cout << "Wanna attack?(Y/N)";
@@ -227,12 +236,21 @@ void battle(int option, int level[], double attack[], double defend[], int life,
             cout << "**********************************" << endl;
             cout << "You defeat the monster //" << endl;
             cout << "**********************************" << endl;
-            point = point + 1;
-            cout << "Now you have point: " << point <<  endl;
+
+            // increase the exp obtained from battle
+            curr_exp += exp_gain;
     }
-    if (point % 2 != 0)
+
+    int prev_level = game_level;
+
+    // a loop that determine how many level will be up
+    while(curr_exp >= exp[game_level]){
+        game_level++;
+    }
+
+    // check if needs to level up
+    if (prev_level != game_level)
     {
-            game_level = game_level + 1;
             game_life = game_life + 15;
             cout << "Congratulations! Level up!!!" << endl;
             cout << "===========================================" << endl;
@@ -243,16 +261,16 @@ void battle(int option, int level[], double attack[], double defend[], int life,
     }
 
     // save the result
-    updateInfo(game_level, attack[game_level], defend[game_level], game_life, P);
+    updateInfo(game_level, attack[game_level], defend[game_level], game_life, curr_exp, P);
 
     cout << "Do you want to back to the menu?(Y/N)";
     cin >> choice;
     if(choice == 'Y' || choice == 'y')
-        menu(level, attack, defend, life, point, index, P);
+        menu(level, attack, defend, life, exp, index, P);
 }
 
 
-void check_status(int level[], double attack[], double defend[], int life, int point, int index, Player P){
+void check_status(int level[], double attack[], double defend[], int life, int exp[], int index, Player P){
     system ("CLS");
     cout << "*******************************************" << endl;
     cout << "Checking status..." << endl;
@@ -262,14 +280,15 @@ void check_status(int level[], double attack[], double defend[], int life, int p
     cout << "=  Your life now is: " << P.getLife() << endl;
     cout << "=  Now your attack point is: " << P.getAtkPt() << endl;
     cout << "=  and defend point: " << P.getDefPt() << endl;
+    cout << "= Your current exp is: " << P.getExp() << endl;
     cout << "*******************************************" << endl;
     system ("PAUSE");
-    menu(level, attack, defend, life, point, index, P);
+    menu(level, attack, defend, life, exp, index, P);
 }
 
 // ask user to create an account for saving the data
 // if the user already has an account, overwrite the data
-bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int point, int index, Player P){
+bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int exp[], int index, Player P){
     system ("CLS");
     string account_name;
     string pwd;
@@ -290,7 +309,7 @@ bool save_player(string username, string passward, int level[], double attack[],
     // overwrite the user's data
     // saving order: account name, password, name, level, attack point, defend point, life point
     fout.open("player_" + username + "_data" + ".txt", ofstream::trunc); // reference: http://www.cplusplus.com/reference/fstream/ofstream/open/
-    fout << username << " " << passward << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << endl;
+    fout << username << " " << passward << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << " " << P.getExp() << endl;
     fout.close();
 
     // debug
@@ -298,11 +317,12 @@ bool save_player(string username, string passward, int level[], double attack[],
     cout << "----------------------------" << endl;
     cout << username << endl;
     cout << passward << endl;
-    cout << P.getName() << endl;
-    cout << P.getLevel() << endl;
-    cout << P.getAtkPt() << endl;
-    cout << P.getDefPt() << endl;
-    cout << P.getLife() << endl;
+    cout << "Name: " << P.getName() << endl;
+    cout << "Level: " << P.getLevel() << endl;
+    cout << "Attack: " << P.getAtkPt() << endl;
+    cout << "Defend: " << P.getDefPt() << endl;
+    cout << "Life point: " << P.getLife() << endl;
+    cout << "Exp: " << P.getExp() << endl;
     cout << "----------------------------" << endl;
 
     // disable for now
@@ -316,11 +336,6 @@ bool save_player(string username, string passward, int level[], double attack[],
     return true;
 }
 
-bool load_player(){
-    return true;
-}
-
-
 // reference: https://ubuntuforums.org/showthread.php?t=296142
 void sleep(unsigned int mseconds)
 {
@@ -328,11 +343,12 @@ void sleep(unsigned int mseconds)
     while (goal > clock());
 }
 
-void updateInfo(int level, double attack, double defend, int life, Player &P){
+void updateInfo(int level, double attack, double defend, int life, int curr_exp, Player &P){
     P.setLevel(level);
     P.setAtkpt(attack);
     P.setDefpt(defend);
     P.setLife(life);
+    P.setExp(curr_exp);
     sleep(1000); // delay to simulate loading
 }
 
@@ -347,7 +363,8 @@ bool login(string &username, string &passward, Player &P){
     int level = 0,
         life = 100,
         attack = 1,
-        defend = 1;
+        defend = 1,
+        exp = 0;
 
     do{
         cout << "Please enter your username (type NA to quit login):";
@@ -384,7 +401,7 @@ bool login(string &username, string &passward, Player &P){
         }
         else{
             // once the user account is found, check the passward next
-            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life;
+            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life >> exp;
 
             // // debug
             // cout << "readUser: [" << readUser << "]" << endl;
@@ -417,6 +434,7 @@ bool login(string &username, string &passward, Player &P){
     P.setAtkpt(attack);
     P.setDefpt(defend);
     P.setLife(life);
+    P.setExp(exp);
 
     return status;
 }
