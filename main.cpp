@@ -11,12 +11,12 @@
 
 // void fileOpen(int level[], double attack[], double defend[], int &count);
 void fileOpen(int level[], double attack[], double defend[], int exp[], int &count);
-bool login(string &userName, string &passward, Player&);
-void menu(int level[], double attack[], double defend[], int life, int exp[], int index, Player&);
-void battle(int option, int level[], double attack[], double defend[], int life, int exp[], int index, Player&);
-void check_status(int level[], double attack[], double defend[], int life, int exp[], int index, Player);
-void updateInfo(int level, double attack, double defend, int life, int curr_exp, Player&);
-bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int exp[], int index, Player);
+bool login(string &userName, string &password, Player&);
+void menu(double attack[], double defend[], int life, int exp[], Player&);
+void battle(int option, double attack[], double defend[], int life, int exp[], Player&);
+void check_status(double attack[], double defend[], int life, int exp[], Player);
+void updateInfo(int level, double attack, double defend, int life, int curr_exp, int curr_money, int curr_diamond, Player&);
+bool save_player(string username, string password, double attack[], double defend[], int life, int exp[], Player);
 void sleep(unsigned int mseconds);
 
 using namespace std;
@@ -27,7 +27,6 @@ int main()
     int count = 0,
         life = 100,
         level[SIZE],
-        index = 0,
         exp[SIZE];
     double attack[SIZE],
            defend[SIZE];
@@ -42,13 +41,13 @@ int main()
 
     // login information
     string username;
-    string passward;
+    string password;
 
     cout << "------------------------------------------" << endl;
     cout << "Welcome to Tony's game!" << endl;
     cout << "Please log in your account to continue the game" << endl;
     cout << "------------------------------------------" << endl;
-    bool hasAccount = login(username, passward, P);
+    bool hasAccount = login(username, password, P);
 
     if(hasAccount){
         system ("CLS");
@@ -68,18 +67,18 @@ int main()
         cin >> name;
         P.setName(name);
         cout << "\n------------------------------------------" << endl;
-        cout << "Hello "<< name << ", now you are in level "<< level[0] << " , you are ready to have an adventure!" << endl;
+        cout << "Hello "<< name << ", now you are in level 0 , you are ready to have an adventure!" << endl;
         cout << "This game has 5 level. if you accomplish all of them. You are the winner!" << endl;
     }
 
     // enter menu to start the selection
-    menu(level, attack, defend, life, exp, index, P);
+    menu(attack, defend, life, exp, P);
 
     char choice;
     cout << "Would you like to save your progress? (Y/N)";
     cin >> choice;
     if (choice == 'y' || choice == 'Y'){
-        save_player(username, passward, level, attack, defend, life, exp, index, P); // save player's information
+        save_player(username, password, attack, defend, life, exp, P); // save player's information
     }
 
     return 0;
@@ -103,7 +102,7 @@ void fileOpen(int level[], double attack[], double defend[], int exp[], int &cou
     inputFile.close();
 }
 
-void menu(int level[], double attack[], double defend[], int life, int exp[], int index, Player &P)
+void menu(double attack[], double defend[], int life, int exp[], Player &P)
 {
         string user_input = "";
         system ("CLS");
@@ -139,13 +138,13 @@ void menu(int level[], double attack[], double defend[], int life, int exp[], in
                 case 3:
                 case 4:
                 case 5:
-                    battle(option, level, attack, defend, life, exp, index, P);
+                    battle(option, attack, defend, life, exp, P);
                     break;
                 case 6:
                     cout << "Game is over." << endl;
                     break;
                 case 7:
-                    check_status(level, attack, defend, life, exp, index, P);
+                    check_status(attack, defend, life, exp, P);
                     break;
                 default:
                     {
@@ -160,34 +159,41 @@ void menu(int level[], double attack[], double defend[], int life, int exp[], in
         } while(option < 1 || option > 8);
 }
 
-void battle(int option, int level[], double attack[], double defend[], int life, int exp[], int index, Player &P)
+void battle(int option, double attack[], double defend[], int life, int exp[], Player &P)
 {
     // default value (level 1)
     char choice;
-    double damage = 2;
-    double monsterLife = 5;
-    int exp_gain = 25;
+    double damage = 2,
+           monsterLife = 5;
+    int exp_gain = 25,
+        money_gain = 2,
+        diamond_gain = 0;
 
     // adjust the level based on user's input
     if (option == 2){
         damage = 5;
         monsterLife = 10;
         exp_gain = 50;
+        money_gain = 4;
     }
     else if(option == 3){
         damage = 15;
         monsterLife = 20;
         exp_gain = 75;
+        money_gain = 8;
     }
     else if(option == 4){
         damage = 40;
         monsterLife = 50;
         exp_gain = 150;
+        money_gain = 16;
     }
     else if(option == 5){
         damage = 150;
         monsterLife = 500;
         exp_gain = 300;
+        money_gain = 50;
+        diamond_gain = 1;
     }
     else{
     }
@@ -205,7 +211,9 @@ void battle(int option, int level[], double attack[], double defend[], int life,
         game_life = P.getLife(),
         game_attack = P.getAtkPt(),
         game_defend = P.getDefPt(),
-        curr_exp = P.getExp();
+        curr_exp = P.getExp(),
+        curr_money = P.getMoney(),
+        curr_diamond = P.getDiamond();
 
     do{
         cout << "Wanna attack?(Y/N)";
@@ -237,8 +245,10 @@ void battle(int option, int level[], double attack[], double defend[], int life,
             cout << "You defeat the monster //" << endl;
             cout << "**********************************" << endl;
 
-            // increase the exp obtained from battle
+            // increase the exp, money and diamond obtained from battle
             curr_exp += exp_gain;
+            curr_money += money_gain;
+            curr_diamond = diamond_gain;
     }
 
     int prev_level = game_level;
@@ -261,16 +271,16 @@ void battle(int option, int level[], double attack[], double defend[], int life,
     }
 
     // save the result
-    updateInfo(game_level, attack[game_level], defend[game_level], game_life, curr_exp, P);
+    updateInfo(game_level, attack[game_level], defend[game_level], game_life, curr_exp, curr_money, curr_diamond, P);
 
     cout << "Do you want to back to the menu?(Y/N)";
     cin >> choice;
     if(choice == 'Y' || choice == 'y')
-        menu(level, attack, defend, life, exp, index, P);
+        menu(attack, defend, life, exp, P);
 }
 
 
-void check_status(int level[], double attack[], double defend[], int life, int exp[], int index, Player P){
+void check_status(double attack[], double defend[], int life, int exp[], Player P){
     system ("CLS");
     cout << "*******************************************" << endl;
     cout << "Checking status..." << endl;
@@ -281,26 +291,29 @@ void check_status(int level[], double attack[], double defend[], int life, int e
     cout << "=  Now your attack point is: " << P.getAtkPt() << endl;
     cout << "=  and defend point: " << P.getDefPt() << endl;
     cout << "= Your current exp is: " << P.getExp() << endl;
+    cout << "= You have " << P.getMoney() << "$" << endl;
+    cout << "= You have " << P.getDiamond() << " diamond(s)" << endl;
     cout << "*******************************************" << endl;
     system ("PAUSE");
-    menu(level, attack, defend, life, exp, index, P);
+    menu(attack, defend, life, exp, P);
 }
+
 
 // ask user to create an account for saving the data
 // if the user already has an account, overwrite the data
-bool save_player(string username, string passward, int level[], double attack[], double defend[], int life, int exp[], int index, Player P){
+bool save_player(string username, string password, double attack[], double defend[], int life, int exp[], Player P){
     system ("CLS");
     string account_name;
     string pwd;
 
     // first time user
-    if(username.empty() == true || passward.empty() == true){
+    if(username.empty() == true || password.empty() == true){
         cout << "Please enter your account name (no spaces in between): ";
         cin >> account_name;
         cout << "Please enter your password (no spaces in between): ";
         cin >> pwd;
         username = account_name;
-        passward = pwd;
+        password = pwd;
     }
 
     cout << "Saving the player's data..." << endl;
@@ -309,26 +322,29 @@ bool save_player(string username, string passward, int level[], double attack[],
     // overwrite the user's data
     // saving order: account name, password, name, level, attack point, defend point, life point
     fout.open("player_" + username + "_data" + ".txt", ofstream::trunc); // reference: http://www.cplusplus.com/reference/fstream/ofstream/open/
-    fout << username << " " << passward << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << " " << P.getExp() << endl;
+    fout << username << " " << password << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt()
+    << " " << P.getDefPt() << " " << P.getLife() << " " << P.getExp() << " "<< P.getMoney() << " " << P.getDiamond() << endl;
     fout.close();
 
     // debug
     cout << "overwriting these data..." << endl;
     cout << "----------------------------" << endl;
-    cout << username << endl;
-    cout << passward << endl;
+    cout << "User name: "<< username << endl;
+    cout << "Password: " << password << endl;
     cout << "Name: " << P.getName() << endl;
     cout << "Level: " << P.getLevel() << endl;
     cout << "Attack: " << P.getAtkPt() << endl;
     cout << "Defend: " << P.getDefPt() << endl;
     cout << "Life point: " << P.getLife() << endl;
     cout << "Exp: " << P.getExp() << endl;
+    cout << "Money: " << P.getMoney() << endl;
+    cout << "Diamond: " << P.getDiamond() << endl;
     cout << "----------------------------" << endl;
 
     // disable for now
     // create an account for user if they doesn't have one
     // fout.open("player_" + account_name + "_info" + ".txt");
-    // fout << account_name << " " << passward;
+    // fout << account_name << " " << password;
     // fout.close();
 
     sleep(1600); // delay to simulate loading
@@ -343,17 +359,19 @@ void sleep(unsigned int mseconds)
     while (goal > clock());
 }
 
-void updateInfo(int level, double attack, double defend, int life, int curr_exp, Player &P){
+void updateInfo(int level, double attack, double defend, int life, int curr_exp, int curr_money, int curr_diamond, Player &P){
     P.setLevel(level);
     P.setAtkpt(attack);
     P.setDefpt(defend);
     P.setLife(life);
     P.setExp(curr_exp);
+    P.setMoney(curr_money);
+    P.setDiamond(curr_diamond);
     sleep(1000); // delay to simulate loading
 }
 
 // login in user's account
-bool login(string &username, string &passward, Player &P){
+bool login(string &username, string &password, Player &P){
     fstream fin;
     bool status = false;
 
@@ -364,7 +382,9 @@ bool login(string &username, string &passward, Player &P){
         life = 100,
         attack = 1,
         defend = 1,
-        exp = 0;
+        exp = 0,
+        money = 0,
+        diamond = 0;
 
     do{
         cout << "Please enter your username (type NA to quit login):";
@@ -383,8 +403,8 @@ bool login(string &username, string &passward, Player &P){
         }
 
         sleep(1000); // delay to simulate loading
-        cout << "Please enter your passward:";
-        cin >> passward;
+        cout << "Please enter your password:";
+        cin >> password;
         sleep(1000); // delay to simulate loading
 
         cout << "Checking the account..." << endl;
@@ -400,8 +420,8 @@ bool login(string &username, string &passward, Player &P){
             sleep(1000); // delay to simulate loading
         }
         else{
-            // once the user account is found, check the passward next
-            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life >> exp;
+            // once the user account is found, check the password next
+            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life >> exp >> money >> diamond;
 
             // // debug
             // cout << "readUser: [" << readUser << "]" << endl;
@@ -412,8 +432,8 @@ bool login(string &username, string &passward, Player &P){
             // cout << "defend: ["<< defend << "]" << endl;
             // cout << "life: [" << life << "]" << endl;
 
-            // if the username and passward match, it log in sucessfully
-            if(readUser == username && readPwd == passward){
+            // if the username and password match, it log in sucessfully
+            if(readUser == username && readPwd == password){
                 status = true;
             }
             else{
@@ -428,13 +448,15 @@ bool login(string &username, string &passward, Player &P){
 
     // save account info
     P.setUser(username);
-    P.setPwd(passward);
+    P.setPwd(password);
     P.setName(name);
     P.setLevel(level);
     P.setAtkpt(attack);
     P.setDefpt(defend);
     P.setLife(life);
     P.setExp(exp);
+    P.setMoney(money);
+    P.setDiamond(diamond);
 
     return status;
 }

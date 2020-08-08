@@ -4,7 +4,7 @@ This is the game that is written in C++. In this project, I am writting a progra
 - Level Up via battle
 * Currently develop a new level system: setting up that the level will be increase when it reaches the required exp (completed)
 * Adding one more feature in player class: exp to keep track of levels (completed)
-* Obtaining money from battle. User will be able to use the money to buy equipments (in progress)
+* Obtaining money from battle. User will be able to use the money to buy equipments (completed for obtaining money, currently develop the store for purchasing.)
 
 - Save your information (completed)
 - Load your infornation (completed)
@@ -12,4 +12,5 @@ This is the game that is written in C++. In this project, I am writting a progra
 Future design:
 - able to purchase items
 - adding a new feature: avoid rate
-- cheating code such as increaase attack point, decrease monster's attack...etc 
+- cheating code such as increaase attack point, decrease monster's attack...etc
+- game log: record the history that who have played the game in specific time
