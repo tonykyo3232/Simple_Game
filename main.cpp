@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <time.h>
 #include <stdlib.h> // reference: https://mathbits.com/MathBits/CompSci/Introduction/clear.htm
+#include<ctime> // used to work with date and time
 
 #include "player.h"
 
@@ -13,11 +14,13 @@ void fileOpen(int level[], double attack[], double defend[], int exp[], int &cou
 void main_menu(double attack[], double defend[], int exp[], Player&);
 void battle_menu(double attack[], double defend[], int exp[], Player&);
 void battle(int option, double attack[], double defend[], int exp[], Player&);
+void buying_menu(Player&);
 void check_status(double attack[], double defend[], int exp[], Player);
 void updateInfo(int level, double attack, double defend, int life, int curr_exp, int curr_money, int curr_diamond, Player&);
 void sleep(unsigned int mseconds);
 bool login(string &userName, string &password, Player&);
 bool save_player(double attack[], double defend[], int exp[], Player);
+void write_userlog(bool login, Player);
 
 using namespace std;
 
@@ -46,6 +49,7 @@ int main()
     cout << "Please log in your account to continue the game" << endl;
     cout << "------------------------------------------" << endl;
     bool hasAccount = login(username, password, P);
+    write_userlog(true, P);
 
     if(hasAccount){
         system ("CLS");
@@ -85,6 +89,7 @@ int main()
     cout << "\n------------------------------------------" << endl;
     cout << "Game is over." << endl;
     cout << "------------------------------------------" << endl;
+    write_userlog(false, P);
     system ("PAUSE");
     return 0;
 }
@@ -143,9 +148,7 @@ void main_menu(double attack[], double defend[], int exp[], Player &P)
                 check_status(attack, defend, exp, P);
                 break;
             case 3:
-                //buying_menu()
-                cout << "Still developing... sorry :(" << endl;
-                system ("PAUSE");
+                buying_menu(P);
                 break;
             case 4:
                 save_player(attack, defend, exp, P);
@@ -171,7 +174,7 @@ void battle_menu(double attack[], double defend[], int exp[], Player &P)
 {
         string user_input = "";
         bool exit = false;
-       
+
         do {
             system ("CLS");
             cout << "------------------------------------------" << endl;
@@ -525,4 +528,112 @@ bool login(string &username, string &password, Player &P){
     P.setDiamond(diamond);
 
     return status;
+}
+
+void write_userlog(bool login, Player P){
+    time_t t; // t passed as argument in function time()
+    struct tm * tt; // decalring variable for localtime()
+    time (&t); //passing argument to time()
+    tt = localtime(&t);
+
+    ofstream fout;
+
+    fout.open("userlog.txt", ofstream::app);
+
+    if (login == true)
+        fout << "User " << P.getName() << "(" << P.getUser() << ") login time: "<< asctime(tt);
+    else
+        fout << "User " << P.getName() << "(" << P.getUser() << ") logout time: "<< asctime(tt);
+
+    fout.close();
+}
+
+
+void buying_menu(Player &P){
+
+    string user_input = "";
+    bool exit = false;
+
+    do{
+        system ("CLS");
+        cout << "*****************************" << endl;
+        cout << "Welcome to Tony's shop" << endl;
+        cout << "Please enter the option to purchase the item." << endl;
+        cout << "Now you have " <<  P.getMoney() << "$ and " << P.getDiamond() << " diamond(s)" << endl;
+        cout << "*****************************" << endl;
+
+        cout << "\n----------------------------" << endl;
+        cout << "1. Life potion - 5$" << endl;
+        cout << "2. Sell diamond(s)" << endl;
+        cout << "3. Strengthen your weapon - 20$" << endl;
+        cout << "4. Strengthen your shield - 20$" << endl;
+        cout << "5. Exit Shop" << endl;
+        cout << "----------------------------" << endl;
+        cout << "Enter your option: ";
+        cin >> user_input;
+
+        // convert user input to integer
+        // if user enter "1", it will be converted to 1
+        // if user enter "abc", it will be converted to 0
+        stringstream toInt(user_input);
+
+        // store the user input into option as an integer
+        int option = 0;
+        toInt >> option;
+
+        switch(option)
+        {
+            case 1:
+                // will develop
+                cout << "will develop..." << endl;
+                sleep(1600); // delay to simulate loading
+                system ("PAUSE");
+                break;
+            case 2:
+            {
+                int curr_diamond = P.getDiamond();
+                if(curr_diamond == 0){
+                    cout << "Sorry! You don't have any diamond to sell..." << endl;
+                }
+                else{
+                    int money_gain = curr_diamond * 50;
+                    curr_diamond = 0;
+                    int total_money = P.getMoney() + money_gain;
+                    P.setMoney(total_money);
+                    P.setDiamond(0);
+                    cout << "Diamond(s) have sold and you gain " << money_gain << "$" << endl;
+                }
+                sleep(1600); // delay to simulate loading
+                system ("PAUSE");
+                break;
+            }
+            case 3:
+                // will develop
+                cout << "will develop..." << endl;
+                sleep(1600); // delay to simulate loading
+                system ("PAUSE");
+                break;
+            case 4:
+                // will develop
+                cout << "will develop..." << endl;
+                sleep(1600); // delay to simulate loading
+                system ("PAUSE");
+                break;
+            case 5:
+                cout << "Returning back to main menu..." << endl;
+                sleep(1600); // delay to simulate loading
+                exit = true;
+                break;
+            default:
+            {
+                cout << "Please enter the valid number!" << endl;
+                cout << "Please enter the option: ";
+                cin >> user_input;
+                stringstream toInt(user_input);
+                int option = 0;
+                toInt >> option;
+            }
+        }
+
+    } while(exit == false);
 }
