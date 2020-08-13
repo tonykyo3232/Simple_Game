@@ -18,6 +18,10 @@ Player::Player(){
     // player's accessories
     money = 0;
     diamond = 0;
+
+    extra_atk = 0;
+    extra_def = 0;
+    life_potion = 0;
 }
 
 // Constructor for assigning value

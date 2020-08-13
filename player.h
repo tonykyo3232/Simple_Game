@@ -14,6 +14,12 @@ private:
     int attack;
     int defend;
     int exp;
+
+    int extra_atk;
+    int extra_def;
+    int life_potion;
+
+    // future design
     double avoidRate;
 
     // user account info
@@ -38,6 +44,9 @@ public:
     int getExp(){return exp;} const
     int getMoney(){return money;} const
     int getDiamond(){return diamond;} const
+    int getExtraAtk(){return extra_atk;} const
+    int getExtraDef(){return extra_def;} const
+    int getLifePotion(){return life_potion;} const
     string getUser() {return user_name;} const
     string getPwd() {return password;} const
 
@@ -52,6 +61,9 @@ public:
     bool setExp(int entry_exp) {this->exp = entry_exp; return true;}
     bool setMoney(int entry_money) {this->money = entry_money; return true;}
     bool setDiamond(int entry_diamond) {this->diamond = entry_diamond; return true;}
+    bool setExtraAtk(int entry_extra_atk) {this->extra_atk = entry_extra_atk; return true;}
+    bool setExtraDef(int entry_extra_def) {this->extra_def = entry_extra_def; return true;}
+    bool setLifePotion(int entry_life_potion) {this->life_potion = entry_life_potion; return true;}
 
     // future design parts
     double getAvoidRate();

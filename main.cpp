@@ -19,7 +19,7 @@ void check_status(double attack[], double defend[], int exp[], Player);
 void updateInfo(int level, double attack, double defend, int life, int curr_exp, int curr_money, int curr_diamond, Player&);
 void sleep(unsigned int mseconds);
 bool login(string &userName, string &password, Player&);
-bool save_player(double attack[], double defend[], int exp[], Player);
+bool save_player(double attack[], double defend[], int exp[], Player&);
 void write_userlog(bool login, Player);
 
 using namespace std;
@@ -49,13 +49,13 @@ int main()
     cout << "Please log in your account to continue the game" << endl;
     cout << "------------------------------------------" << endl;
     bool hasAccount = login(username, password, P);
-    write_userlog(true, P);
 
     if(hasAccount){
         system ("CLS");
         cout << "------------------------------------------" << endl;
         cout << "Welcome back " << P.getName() << "!" << endl;
         cout << "------------------------------------------" << endl;
+        write_userlog(true, P);
         system ("PAUSE");
     }
     else{
@@ -68,6 +68,7 @@ int main()
         cout << "Enter name: ";
         cin >> name;
         P.setName(name);
+        write_userlog(true, P);
         system ("CLS");
         cout << "Hello "<< name << ", now you are in level 0 , you are ready to have an adventure!" << endl;
         cout << "This game has 5 level. if you accomplish all of them. You are the winner!" << endl;
@@ -268,22 +269,21 @@ void battle(int option, double attack[], double defend[], int exp[], Player &P)
         money_gain = 50;
         diamond_gain = 1;
     }
-    else{
-    }
+    else{}
     system ("CLS");
     cout << "------------------------------------------------" << endl;
     cout << "=  You are in story " << option << "." << endl;
     cout << "=  Your current Level is: " << P.getLevel() << endl;
     cout << "=  Your life now is: " << P.getLife() << endl;
-    cout << "=  Now your attack point is: " << P.getAtkPt() << endl;
-    cout << "=  and defend point: " << P.getDefPt() << endl;
+    cout << "=  Now your attack point is: " << P.getAtkPt() << "+(" << P.getExtraAtk() << ")" << endl;
+    cout << "=  and defend point: " << P.getDefPt() << "+(" << P.getExtraDef() << ")" << endl;
     cout << "-------------------------------------------------" << endl;
     cout << "Here is a monster. Please start attacking." << endl;
 
     int game_level = P.getLevel(),
         game_life = P.getLife(),
-        game_attack = P.getAtkPt(),
-        game_defend = P.getDefPt(),
+        game_attack = P.getAtkPt() + P.getExtraAtk(),
+        game_defend = P.getDefPt() + P.getExtraDef(),
         curr_exp = P.getExp(),
         curr_money = P.getMoney(),
         curr_diamond = P.getDiamond();
@@ -310,6 +310,28 @@ void battle(int option, double attack[], double defend[], int exp[], Player &P)
             game_life = game_life - (damage + 2) + game_defend;
             cout << "The monster attacks you directly!!! Now your life is remaining " << game_life << " points. Please ATTACK back!!!" << endl;
         }
+
+        cout << "Your life point is " << game_life << ", do you want to use the life potion? (You have " << P.getLifePotion() << " life potion) (Y/N)";
+        char input, input2;
+        cin >> input;
+        if(input == 'Y' || input == 'y'){
+            bool need_heal = true;
+            while(need_heal){
+                cout << "How many life potion?";
+                cin >> input2;
+                int num = input2 - 48; //convert char to int
+                if(num > P.getLifePotion()){
+                    cout << "Sorry. You don't have enough Life potions!" << endl;
+                }
+                else{
+                    for(int i = 0; i < num; i++){
+                        game_life += 10;
+                    }
+                    need_heal = false;
+                    P.setLifePotion(P.getLifePotion() - num);
+                }
+            }
+        }         
     } while(monsterLife > 0);
 
     if (game_life > 0 && monsterLife < 1)
@@ -338,8 +360,8 @@ void battle(int option, double attack[], double defend[], int exp[], Player &P)
             cout << "Congratulations! Level up!!!" << endl;
             cout << "===========================================" << endl;
             cout << "Level : " << game_level << endl;
-            cout << "Attack: " << attack[game_level] << endl;
-            cout << "Defend: " << defend[game_level] << endl;
+            cout << "Attack: " << attack[game_level] << "+(" << P.getExtraAtk() << ")" << endl;
+            cout << "Defend: " << defend[game_level] << "+(" << P.getExtraDef() << ")" << endl;
             cout << "===========================================" << endl;
     }
 
@@ -357,11 +379,12 @@ void check_status(double attack[], double defend[], int exp[], Player P){
     sleep(1900);
     cout << "=  Your current Level is: " << P.getLevel() << endl;
     cout << "=  Your life now is: " << P.getLife() << endl;
-    cout << "=  Now your attack point is: " << P.getAtkPt() << endl;
-    cout << "=  and defend point: " << P.getDefPt() << endl;
-    cout << "= Your current exp is: " << P.getExp() << endl;
-    cout << "= You have " << P.getMoney() << "$" << endl;
-    cout << "= You have " << P.getDiamond() << " diamond(s)" << endl;
+    cout << "=  Number of life potion: " << P.getLifePotion() << endl;
+    cout << "=  Now your attack point is: " << P.getAtkPt()  << "+(" << P.getExtraAtk() << ")" << endl;
+    cout << "=  and defend point: " << P.getDefPt() << "+(" << P.getExtraDef() << ")" << endl;
+    cout << "=  Your current exp is: " << P.getExp() << endl;
+    cout << "=  You have " << P.getMoney() << "$" << endl;
+    cout << "=  You have " << P.getDiamond() << " diamond(s)" << endl;
     cout << "*******************************************" << endl;
     system ("PAUSE");
 }
@@ -369,7 +392,7 @@ void check_status(double attack[], double defend[], int exp[], Player P){
 
 // ask user to create an account for saving the data
 // if the user already has an account, overwrite the data
-bool save_player(double attack[], double defend[], int exp[], Player P){
+bool save_player(double attack[], double defend[], int exp[], Player &P){
     system ("CLS");
     string account_name;
     string pwd;
@@ -390,8 +413,10 @@ bool save_player(double attack[], double defend[], int exp[], Player P){
     // overwrite the user's data
     // saving order: account name, password, name, level, attack point, defend point, life point
     fout.open("player_" + P.getUser() + "_data" + ".txt", ofstream::trunc); // reference: http://www.cplusplus.com/reference/fstream/ofstream/open/
-    fout << P.getUser() << " " << P.getPwd() << " " << P.getName() << " " << P.getLevel() << " " << P.getAtkPt()
-    << " " << P.getDefPt() << " " << P.getLife() << " " << P.getExp() << " "<< P.getMoney() << " " << P.getDiamond() << endl;
+    fout << P.getUser() << " " << P.getPwd() << " " << P.getName() << " " << endl
+    << P.getLevel() << " " << P.getAtkPt() << " " << P.getDefPt() << " " << P.getLife() << " " << P.getExp() << endl
+    << P.getMoney() << " " << P.getDiamond() << endl
+    << P.getExtraAtk() << " " << P.getExtraDef() << " " << P.getLifePotion() << endl;
     fout.close();
 
     // debug
@@ -401,12 +426,13 @@ bool save_player(double attack[], double defend[], int exp[], Player P){
     cout << "Password: " << P.getPwd() << endl;
     cout << "Name: " << P.getName() << endl;
     cout << "Level: " << P.getLevel() << endl;
-    cout << "Attack: " << P.getAtkPt() << endl;
-    cout << "Defend: " << P.getDefPt() << endl;
+    cout << "Attack: " << P.getAtkPt() << "+(" << P.getExtraAtk() << ")" << endl;
+    cout << "Defend: " << P.getDefPt() << "+(" << P.getExtraDef() << ")" << endl;
     cout << "Life point: " << P.getLife() << endl;
     cout << "Exp: " << P.getExp() << endl;
     cout << "Money: " << P.getMoney() << endl;
     cout << "Diamond: " << P.getDiamond() << endl;
+    cout << "Number of life potion: " << P.getLifePotion() << endl;
     cout << "----------------------------" << endl;
 
     // disable for now
@@ -453,7 +479,10 @@ bool login(string &username, string &password, Player &P){
         defend = 1,
         exp = 0,
         money = 0,
-        diamond = 0;
+        diamond = 0,
+        extra_atk = 0,
+        extra_def = 0,
+        life_potion = 0;
 
     do{
         cout << "Please enter your username (type NA to quit login):";
@@ -490,7 +519,7 @@ bool login(string &username, string &password, Player &P){
         }
         else{
             // once the user account is found, check the password next
-            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life >> exp >> money >> diamond;
+            fin >> readUser >> readPwd >> name >> level >> attack >> defend >> life >> exp >> money >> diamond >> extra_atk >> extra_def >> life_potion;
 
             // // debug
             // cout << "readUser: [" << readUser << "]" << endl;
@@ -526,6 +555,9 @@ bool login(string &username, string &password, Player &P){
     P.setExp(exp);
     P.setMoney(money);
     P.setDiamond(diamond);
+    P.setExtraAtk(extra_atk);
+    P.setExtraDef(extra_def);
+    P.setLifePotion(life_potion);
 
     return status;
 }
@@ -584,11 +616,22 @@ void buying_menu(Player &P){
         switch(option)
         {
             case 1:
-                // will develop
-                cout << "will develop..." << endl;
+            {
+                int curr_life_potion = P.getLifePotion();
+                if(P.getMoney() >= 5){
+                    curr_life_potion++;
+                    int total_money = P.getMoney() - 5;
+                    P.setLifePotion(curr_life_potion);
+                    P.setMoney(total_money);
+                    cout << "You have purchase a life potion!" << endl;
+                }
+                else{
+                    cout << "Sorry. You don't have enough money!" << endl;
+                }
                 sleep(1600); // delay to simulate loading
                 system ("PAUSE");
                 break;
+            }
             case 2:
             {
                 int curr_diamond = P.getDiamond();
@@ -608,17 +651,39 @@ void buying_menu(Player &P){
                 break;
             }
             case 3:
-                // will develop
-                cout << "will develop..." << endl;
+            {
+                int curr_extra_atk = P.getExtraAtk();
+                if(P.getMoney() >= 20){
+                    int total_money = P.getMoney() - 20;
+                    curr_extra_atk++;
+                    P.setExtraAtk(curr_extra_atk);
+                    P.setMoney(total_money);
+                    cout << "You have Strengthen your weapon!" << endl;
+                }
+                else{
+                    cout << "Sorry. You don't have enough money!" << endl;
+                }
                 sleep(1600); // delay to simulate loading
                 system ("PAUSE");
                 break;
+            }
             case 4:
-                // will develop
-                cout << "will develop..." << endl;
+            {
+                int curr_extra_def = P.getExtraDef();
+                if(P.getMoney() >= 20){
+                    int total_money = P.getMoney() - 20;
+                    curr_extra_def++;
+                    P.setExtraDef(curr_extra_def);
+                    P.setMoney(total_money);
+                    cout << "You have Strengthen your shield!" << endl;
+                }
+                else{
+                    cout << "Sorry. You don't have enough money!" << endl;
+                }
                 sleep(1600); // delay to simulate loading
                 system ("PAUSE");
                 break;
+            }
             case 5:
                 cout << "Returning back to main menu..." << endl;
                 sleep(1600); // delay to simulate loading

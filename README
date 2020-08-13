@@ -4,13 +4,16 @@ This is the game that is written in C++. In this project, I am writting a progra
 - Level Up via battle
 * Currently develop a new level system: setting up that the level will be increase when it reaches the required exp (completed)
 * Adding one more feature in player class: exp to keep track of levels (completed)
-* Obtaining money from battle. User will be able to use the money to buy equipments (completed for obtaining money, currently develop the store for purchasing.)
+* Obtaining money/diamond from battle. 
+
+- Shop in store
+* User will be able to use the money to buy equipments (completed)
+* User can buy: life potion (restore hp), extra attack/defend and sell diamond for money (completed)
 
 - Save your information (completed)
 - Load your infornation (completed)
+- game log: record the login/logout history for all players (completed)
 
 Future design:
-- able to purchase items
 - adding a new feature: avoid rate
-- cheating code such as increaase attack point, decrease monster's attack...etc
-- game log: record the history that who have played the game in specific time
+- cheating code such as increaase attack point, decrease monster's attack...etc.
