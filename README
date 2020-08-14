@@ -15,7 +15,6 @@ This is the game that is written in C++. In this project, I am writting a progra
 - game log: record the login/logout history for all players (completed)
 
 - cheating code is available now
-
 * "life_plus_ten" for life + 10
 * "atk_plus_ten" for extra attack + 10
 * "def_plus_ten" for extra defend + 10
