@@ -14,6 +14,13 @@ This is the game that is written in C++. In this project, I am writting a progra
 - Load your infornation (completed)
 - game log: record the login/logout history for all players (completed)
 
+- cheating code is available now
+
+* "life_plus_ten" for life + 10
+* "atk_plus_ten" for extra attack + 10
+* "def_plus_ten" for extra defend + 10
+* "money_plus_ten" for money + 10
+* "diamond_plus_one" for diamond + 1 
+
 Future design:
 - adding a new feature: avoid rate
-- cheating code such as increaase attack point, decrease monster's attack...etc.
