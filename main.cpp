@@ -15,12 +15,13 @@ void main_menu(double attack[], double defend[], int exp[], Player&);
 void battle_menu(double attack[], double defend[], int exp[], Player&);
 void battle(int option, double attack[], double defend[], int exp[], Player&);
 void buying_menu(Player&);
-void check_status(double attack[], double defend[], int exp[], Player);
+void check_status(Player);
 void updateInfo(int level, double attack, double defend, int life, int curr_exp, int curr_money, int curr_diamond, Player&);
 void sleep(unsigned int mseconds);
 bool login(string &userName, string &password, Player&);
-bool save_player(double attack[], double defend[], int exp[], Player&);
+bool save_player(Player&);
 void write_userlog(bool login, Player);
+void cheat_code(Player&);
 
 using namespace std;
 
@@ -84,7 +85,7 @@ int main()
     cout << "Would you like to save your progress? (Y/N)";
     cin >> choice;
     if (choice == 'y' || choice == 'Y'){
-        save_player(attack, defend, exp, P); // save player's information
+        save_player(P); // save player's information
     }
 
     cout << "\n------------------------------------------" << endl;
@@ -126,7 +127,8 @@ void main_menu(double attack[], double defend[], int exp[], Player &P)
         cout << "2: Check Info" << endl;
         cout << "3: Store" << endl;
         cout << "4: Save game" << endl;
-        cout << "5: Exit the game" << endl;
+        cout << "5: Use cheating code" << endl;
+        cout << "6: Exit the game" << endl;
         cout << "------------------------------------------" << endl;
         cout << "Enter your option: ";
         cin >> user_input;
@@ -146,21 +148,24 @@ void main_menu(double attack[], double defend[], int exp[], Player &P)
                 battle_menu(attack, defend, exp, P);
                 break;
             case 2:
-                check_status(attack, defend, exp, P);
+                check_status(P);
                 break;
             case 3:
                 buying_menu(P);
                 break;
             case 4:
-                save_player(attack, defend, exp, P);
+                save_player(P);
                 break;
             case 5:
+                cheat_code(P);
+                break;
+            case 6:
                 exit = true;
                 break;
             default:
             {
                 cout << "Please enter the valid number!" << endl;
-                cout << "Please select the level: ";
+                cout << "Please enter the option: ";
                 cin >> user_input;
                 stringstream toInt(user_input);
                 int option = 0;
@@ -212,7 +217,7 @@ void battle_menu(double attack[], double defend[], int exp[], Player &P)
                     battle(option, attack, defend, exp, P);
                     break;
                 case 6:
-                    check_status(attack, defend, exp, P);
+                    check_status(P);
                     break;
                 case 7:
                     cout << "Returning to main menu..." << endl;
@@ -331,7 +336,7 @@ void battle(int option, double attack[], double defend[], int exp[], Player &P)
                     P.setLifePotion(P.getLifePotion() - num);
                 }
             }
-        }         
+        }
     } while(monsterLife > 0);
 
     if (game_life > 0 && monsterLife < 1)
@@ -371,7 +376,7 @@ void battle(int option, double attack[], double defend[], int exp[], Player &P)
 }
 
 
-void check_status(double attack[], double defend[], int exp[], Player P){
+void check_status(Player P){
     system ("CLS");
     cout << "*******************************************" << endl;
     cout << "Checking status..." << endl;
@@ -392,7 +397,7 @@ void check_status(double attack[], double defend[], int exp[], Player P){
 
 // ask user to create an account for saving the data
 // if the user already has an account, overwrite the data
-bool save_player(double attack[], double defend[], int exp[], Player &P){
+bool save_player(Player &P){
     system ("CLS");
     string account_name;
     string pwd;
@@ -430,7 +435,7 @@ bool save_player(double attack[], double defend[], int exp[], Player &P){
     cout << "Defend: " << P.getDefPt() << "+(" << P.getExtraDef() << ")" << endl;
     cout << "Life point: " << P.getLife() << endl;
     cout << "Exp: " << P.getExp() << endl;
-    cout << "Money: " << P.getMoney() << endl;
+    cout << "Money: " << P.getMoney() << "$" << endl;
     cout << "Diamond: " << P.getDiamond() << endl;
     cout << "Number of life potion: " << P.getLifePotion() << endl;
     cout << "----------------------------" << endl;
@@ -701,4 +706,70 @@ void buying_menu(Player &P){
         }
 
     } while(exit == false);
+}
+
+void cheat_code(Player &P){
+    string user_input;
+    bool exit = false;
+    do{
+        system ("CLS");
+        cout << "*****************************" << endl;
+        cout << "Welcome to Tony's cheating center" << endl;
+        cout << "*****************************" << endl;
+
+        cout << "Please enter the code (press n for going back to menu):";
+        cin >> user_input;
+
+        if(user_input == "n" || user_input == "N") exit = true;
+        if(exit == true) break;
+
+        if(user_input == "life_plus_ten"){
+            P.setLife(P.getLife() + 10);
+            cout << "cheat code is recognized..." << endl;
+            sleep(1500);
+            cout << "You get 10 extra life" << endl;
+            system("PAUSE");
+            check_status(P);
+        }
+        else if(user_input == "atk_plus_ten"){
+            P.setExtraAtk(P.getExtraAtk() + 10);
+            cout << "cheat code is recognized..." << endl;
+            sleep(1500);
+            cout << "You get 10 extra attack points" << endl;
+            system("PAUSE");
+            check_status(P);
+        }
+        else if(user_input == "def_plus_ten"){
+            P.setExtraDef(P.getExtraDef() + 10);
+            cout << "cheat code is recognized..." << endl;
+            sleep(1500);
+            cout << "You get 10 extra defend points" << endl;
+            system("PAUSE");
+            check_status(P);
+        }
+        else if(user_input == "money_plus_ten"){
+            P.setMoney(P.getMoney() + 10);
+            cout << "cheat code is recognized..." << endl;
+            sleep(1500);
+            cout << "You get extra 10$" << endl;
+            system("PAUSE");
+            check_status(P);
+        }
+        else if(user_input == "diamond_plus_one"){
+            P.setDiamond(P.getDiamond() + 1);
+            cout << "cheat code is recognized..." << endl;
+            sleep(1500);
+            cout << "You get 1 extra diamond" << endl;
+            system("PAUSE");
+            check_status(P);
+        }
+        else{
+            cout << "Please enter the valid cheat code..." << endl;
+            sleep(1500);
+            system("PAUSE");
+        }
+    }while(exit == false);
+
+    cout << "Backing to menu..." << endl;
+    sleep(1500);
 }
